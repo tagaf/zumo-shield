@@ -73,6 +73,12 @@
 #define DIV_BY_10     (1 << 15)
 /*! @} */
 
+#define MELODY_LENGTH 95
+
+// These arrays take up a total of 285 bytes of RAM (out of a limit of 1k (ATmega168), 2k (ATmega328), or 2.5k(ATmega32U4))
+
+
+
 class ZumoBuzzer
 {
   public:
@@ -333,8 +339,8 @@ class ZumoBuzzer
    * note/frequency/melody that is currently playing.
    */
   static void stopPlaying();
-
-
+  void playSuperMario();  // plays super Mario theme song
+  void playSong(unsigned char *melody, unsigned int *tempo)
   private:
 
   // initializes timer for buzzer control
