@@ -5,6 +5,7 @@
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
 #include "ZumoBuzzer.h"
+#include "Arduino.h"
 
 #ifdef __AVR_ATmega32U4__
 
@@ -32,6 +33,48 @@ static const unsigned int cs2_divider[] = {0, 1, 8, 32, 64, 128, 256, 1024};
 
 #endif
 
+unsigned char superMarioMelody[MELODY_LENGTH] =
+{
+	NOTE_E(5), SILENT_NOTE, NOTE_E(5), SILENT_NOTE, NOTE_E(5), SILENT_NOTE, NOTE_C(5), NOTE_E(5),
+	NOTE_G(5), SILENT_NOTE, NOTE_G(4), SILENT_NOTE,
+
+	NOTE_C(5), NOTE_G(4), SILENT_NOTE, NOTE_E(4), NOTE_A(4), NOTE_B(4), NOTE_B_FLAT(4), NOTE_A(4), NOTE_G(4),
+	NOTE_E(5), NOTE_G(5), NOTE_A(5), NOTE_F(5), NOTE_G(5), SILENT_NOTE, NOTE_E(5), NOTE_C(5), NOTE_D(5), NOTE_B(4),
+
+	NOTE_C(5), NOTE_G(4), SILENT_NOTE, NOTE_E(4), NOTE_A(4), NOTE_B(4), NOTE_B_FLAT(4), NOTE_A(4), NOTE_G(4),
+	NOTE_E(5), NOTE_G(5), NOTE_A(5), NOTE_F(5), NOTE_G(5), SILENT_NOTE, NOTE_E(5), NOTE_C(5), NOTE_D(5), NOTE_B(4),
+
+	SILENT_NOTE, NOTE_G(5), NOTE_F_SHARP(5), NOTE_F(5), NOTE_D_SHARP(5), NOTE_E(5), SILENT_NOTE,
+	NOTE_G_SHARP(4), NOTE_A(4), NOTE_C(5), SILENT_NOTE, NOTE_A(4), NOTE_C(5), NOTE_D(5),
+
+	SILENT_NOTE, NOTE_G(5), NOTE_F_SHARP(5), NOTE_F(5), NOTE_D_SHARP(5), NOTE_E(5), SILENT_NOTE,
+	NOTE_C(6), SILENT_NOTE, NOTE_C(6), SILENT_NOTE, NOTE_C(6),
+
+	SILENT_NOTE, NOTE_G(5), NOTE_F_SHARP(5), NOTE_F(5), NOTE_D_SHARP(5), NOTE_E(5), SILENT_NOTE,
+	NOTE_G_SHARP(4), NOTE_A(4), NOTE_C(5), SILENT_NOTE, NOTE_A(4), NOTE_C(5), NOTE_D(5),
+
+	SILENT_NOTE, NOTE_E_FLAT(5), SILENT_NOTE, NOTE_D(5), NOTE_C(5)
+};
+
+unsigned int superMarioTempo[MELODY_LENGTH] =
+{
+	100, 25, 125, 125, 125, 125, 125, 250, 250, 250, 250, 250,
+
+	375, 125, 250, 375, 250, 250, 125, 250, 167, 167, 167, 250, 125, 125,
+	125, 250, 125, 125, 375,
+
+	375, 125, 250, 375, 250, 250, 125, 250, 167, 167, 167, 250, 125, 125,
+	125, 250, 125, 125, 375,
+
+	250, 125, 125, 125, 250, 125, 125, 125, 125, 125, 125, 125, 125, 125,
+
+	250, 125, 125, 125, 250, 125, 125, 200, 50, 100, 25, 500,
+
+	250, 125, 125, 125, 250, 125, 125, 125, 125, 125, 125, 125, 125, 125,
+
+	250, 250, 125, 375, 500
+};
+//superMario theme melody and tempo needed to implement function playSuperMario
 unsigned char buzzerInitialized = 0;
 volatile unsigned char buzzerFinished = 1;  // flag: 0 while playing
 const char *buzzerSequence = 0;
@@ -43,6 +86,7 @@ static char play_mode_setting = PLAY_AUTOMATIC;
 
 extern volatile unsigned char buzzerFinished;  // flag: 0 while playing
 extern const char *buzzerSequence;
+
 
 
 static unsigned char use_program_space; // boolean: true if we should
@@ -290,6 +334,8 @@ void ZumoBuzzer::playFrequency(unsigned int freq, unsigned int dur,
 
   ENABLE_TIMER_INTERRUPT();  
 }
+
+
 
 
 
@@ -727,7 +773,23 @@ void ZumoBuzzer::playMode(unsigned char mode)
     playCheck();
 }
 
-
+void ZumoBuzzer::playSuperMario() //plays super mario song
+{
+	for (int i = 0; i < MELODY_LENGTH; i++)
+	{		
+			this->playNote(superMarioMelody[i], superMarioTempo[i], 15);	
+			delay(superMarioTempo[i]);
+			
+	}
+}
+void ZumoBuzzer::playSong(unsigned char *melody, unsigned int *tempo, int melody_length) // plays whatever song, melody tempo and arrays' length needed
+{
+	for (int i = 0; i < melody_length; i++)
+	{
+		this->playNote(melody[i], tempo[i], 15);
+		delay(tempo[i]);
+	}
+}
 // Checks whether it is time to start another note, and starts
 // it if so.  If it is not yet time to start the next note, this method
 // returns without doing anything.  Call this as often as possible 
